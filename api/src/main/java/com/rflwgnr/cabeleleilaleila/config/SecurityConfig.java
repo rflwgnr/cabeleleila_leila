@@ -68,6 +68,7 @@ public class SecurityConfig {
                                 ).permitAll()
 
                                 .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/users/{username}").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/users").permitAll()
                                 .requestMatchers(HttpMethod.PUT, "/users/permissions").hasRole("ADMIN")
 
@@ -81,6 +82,7 @@ public class SecurityConfig {
 
                                 .requestMatchers(HttpMethod.GET, "/agendamentos").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/agendamentos/{id}").authenticated()
+                                .requestMatchers(HttpMethod.GET, "/agendamentos/futuros/{id}").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/agendamentos").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/agendamentos/{id}").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.PUT, "/agendamentos/{usuarioId}/{agendamentoId}").authenticated()

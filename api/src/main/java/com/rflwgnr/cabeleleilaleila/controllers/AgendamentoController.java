@@ -39,6 +39,15 @@ public class AgendamentoController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/futuros/{id}")
+    public ResponseEntity<List<AgendamentoResponseDTO>> listarAgendamentosFuturosPorUsuario(@PathVariable Long id) {
+        List<Agendamento> agendamentos = service.buscarFuturosPorUsuarioId(id);
+        List<AgendamentoResponseDTO> response = agendamentos.stream()
+                .map(service::toResponseDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping
     public ResponseEntity<AgendamentoResponseDTO> criarAgendamento(@RequestBody AgendamentoDTO dto, Principal principal) {
         String username = principal.getName();

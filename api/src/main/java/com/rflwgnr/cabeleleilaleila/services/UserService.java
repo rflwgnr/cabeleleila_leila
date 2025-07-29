@@ -65,6 +65,18 @@ public class UserService implements UserDetailsService {
         return usuarios;
     }
 
+    public User buscarUsuarioPorUsername(String username) {
+        String usernameLogado = SecurityUtils.getUsuarioLogadoUsername();
+        boolean isAdmin = SecurityUtils.isAdmin();
+
+        if (!isAdmin && !username.equals(usernameLogado)) {
+            throw new AccessDeniedException("Você não tem permissão para acessar os dados deste usuário.");
+        }
+
+        return repository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+    }
+
     @Transactional
     public User atualizarPermissoesUsuarios(UsuarioAtualizadoDTO dto) {
         boolean isAdmin = SecurityUtils.isAdmin();

@@ -16,6 +16,14 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     @Query("SELECT a FROM Agendamento a WHERE a.user.id = :userId")
     Optional<List<Agendamento>> findAgendamentoByUserId(@Param("userId") Long userId);
 
+    @Query("SELECT a FROM Agendamento a WHERE a.user.id = :idUsuario AND " +
+            "(a.dataAgendada > :dataAtual OR (a.dataAgendada = :dataAtual AND a.horaAgendada >= :horaAtual)) AND " +
+            " a.status.id IN :statusIds")
+    List<Agendamento> findAgendamentosFuturosByUsuario(@Param("idUsuario") Long idUsuario,
+                                                       @Param("dataAtual") LocalDate dataAtual,
+                                                       @Param("horaAtual") LocalTime horaAtual,
+                                                       @Param("statusIds") List<Long> status);
+
     @Query("SELECT COUNT(a) > 0 FROM Agendamento a WHERE a.dataAgendada = :dataAgendada AND a.horaAgendada = :horaAgendada " +
             " AND a.status.id IN :statusIds ")
     boolean existsByDataAndHoraAndStatus(@Param("dataAgendada") LocalDate data, @Param("horaAgendada") LocalTime hora,

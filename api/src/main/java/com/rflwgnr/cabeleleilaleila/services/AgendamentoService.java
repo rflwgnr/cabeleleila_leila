@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -85,6 +86,24 @@ public class AgendamentoService {
                 new ResourceNotFoundException("Agendamentos não encontrados."));
     }
 
+    public List<Agendamento> buscarFuturosPorUsuarioId(Long idUsuario) {
+        String usernameLogado = SecurityUtils.getUsuarioLogadoUsername();
+        boolean isAdmin = SecurityUtils.isAdmin();
+
+        User userOn = userRepository.findByUsername(usernameLogado).orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+
+        if (!isAdmin && !userOn.getId().equals(idUsuario)) {
+            throw new AccessDeniedException("Você não tem permissão para acessar os agendamentos deste usuário.");
+        }
+
+        User usuarioBusca = userRepository.findById(idUsuario).orElseThrow(() -> new ResourceNotFoundException("Usuário da busca não encontrado."));
+
+        LocalDate dataAtual = LocalDate.now();
+        LocalTime horaAtual = LocalTime.now();
+        List<Long> statusFiltro = Arrays.asList(1L, 2L);
+        return repository.findAgendamentosFuturosByUsuario(usuarioBusca.getId(), dataAtual, horaAtual, statusFiltro);
+    }
+
     @Transactional
     public Agendamento criarAgendamento(AgendamentoDTO dto, String usernameLogado) {
 
@@ -136,7 +155,12 @@ public class AgendamentoService {
         return user;
     }
 
-    private void validaHorarioAgendamento(AgendamentoDTO dto, Long idAgendamentoIgnroado){
+    private void validaHorarioAgendamento(AgendamentoDTO dto, Long idAgendamentoIgnroado) {
+        if (dto.getDataAgendada().isBefore(LocalDate.now()) ||
+                (dto.getDataAgendada().isEqual(LocalDate.now()) && dto.getHoraAgendada().isBefore(LocalTime.now()))) {
+            throw new RuntimeException("Não é possível agendar para uma data/hora no passado.");
+        }
+
         int idDoDia = dto.getDataAgendada().getDayOfWeek().getValue() % 7 + 1;
         HorarioFuncionamento funcionamento = horarioFuncionamentoRepository
                 .findById((long) idDoDia)
