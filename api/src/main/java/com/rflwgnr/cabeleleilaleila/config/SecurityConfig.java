@@ -83,6 +83,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/agendamentos").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/agendamentos/{id}").authenticated()
                                 .requestMatchers(HttpMethod.GET, "/agendamentos/futuros/{id}").authenticated()
+                                .requestMatchers(HttpMethod.GET, "/agendamentos/proximos/{id}").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/agendamentos").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/agendamentos/{id}").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.PUT, "/agendamentos/{usuarioId}/{agendamentoId}").authenticated()

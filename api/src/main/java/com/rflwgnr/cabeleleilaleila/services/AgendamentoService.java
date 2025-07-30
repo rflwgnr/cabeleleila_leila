@@ -320,4 +320,29 @@ public class AgendamentoService {
             repository.save(agendamento);
         }
     }
+
+    public AgendamentoFuturoResponseDTO verificarSeUsuarioTemAgendamentosNosProximos7Dias(Long idUsuario) {
+        String usernameLogado = SecurityUtils.getUsuarioLogadoUsername();
+        boolean isAdmin = SecurityUtils.isAdmin();
+
+        User userOn = userRepository.findByUsername(usernameLogado)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+
+        if (!isAdmin && !userOn.getId().equals(idUsuario)) {
+            throw new AccessDeniedException("Você não tem permissão para verificar esse usuário.");
+        }
+
+        LocalDate hoje = LocalDate.now();
+        LocalDate dataLimite = hoje.plusDays(7);
+        LocalTime horaAtual = LocalTime.now();
+        List<Long> status = Arrays.asList(1L, 2L);
+
+        Optional<Agendamento> agendamentoOpt = repository.findPrimeiroAgendamentoFuturoPorUsuario(
+                idUsuario, hoje, horaAtual, dataLimite, status
+        );
+
+        return agendamentoOpt
+                .map(agendamento -> new AgendamentoFuturoResponseDTO(true, agendamento.getId()))
+                .orElseGet(() -> new AgendamentoFuturoResponseDTO(false, null));
+    }
 }

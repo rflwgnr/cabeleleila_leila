@@ -1,6 +1,7 @@
 package com.rflwgnr.cabeleleilaleila.controllers;
 
 import com.rflwgnr.cabeleleilaleila.data.dto.agendamentos.AgendamentoDTO;
+import com.rflwgnr.cabeleleilaleila.data.dto.agendamentos.AgendamentoFuturoResponseDTO;
 import com.rflwgnr.cabeleleilaleila.data.dto.agendamentos.AgendamentoResponseDTO;
 import com.rflwgnr.cabeleleilaleila.data.dto.agendamentos.AtualizarStatusAgendamentosDTO;
 import com.rflwgnr.cabeleleilaleila.model.Agendamento;
@@ -46,6 +47,12 @@ public class AgendamentoController {
                 .map(service::toResponseDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/proximos/{id}")
+    public ResponseEntity<AgendamentoFuturoResponseDTO> verificarSeTemAgendamentosNosProximos7Dias(@PathVariable Long id) {
+        AgendamentoFuturoResponseDTO resultado = service.verificarSeUsuarioTemAgendamentosNosProximos7Dias(id);
+        return ResponseEntity.ok(resultado);
     }
 
     @PostMapping
